@@ -1,0 +1,1 @@
+require 'infused/container'
