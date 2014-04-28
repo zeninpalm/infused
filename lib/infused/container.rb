@@ -16,7 +16,7 @@ module Infused
       if has?(id)
         return @ctors_map[id].new(*args, **kwargs)
       else
-        raise ContructorNotRegisteredError.new
+        raise ConstructorNotRegisteredError.new
       end
     end
     
