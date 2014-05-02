@@ -6,7 +6,7 @@ end
 describe Infused::Container do
   
   
-  context "when registering constructors" do
+  context "when registering with constructors" do
     before do
       @container = Infused::Container.new
     end
@@ -23,6 +23,24 @@ describe Infused::Container do
         @container.register(ClassToBeRegistered)
         expect(@container.has?(:ClassToBeRegistered)).to be_true
       end
+    end
+  end
+  
+  context "when registering with implementations" do
+    before do
+      @container = Infused::Container.new
+      @ins = ClassToBeRegistered.new
+    end
+    
+    it "registers implementations under the symbol of class name" do
+      @container.add(@ins)
+      expect(@container.has?(:ClassToBeRegistered)).to be_true
+    end
+    
+    it "returns the same instance" do
+      @container.add(@ins)
+      i = @container.get(:ClassToBeRegistered)
+      expect(i).to be_equal(@ins)
     end
   end
 end

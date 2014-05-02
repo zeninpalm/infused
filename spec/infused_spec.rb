@@ -1,64 +1,68 @@
 require "spec_helper"
 
+# Classes to be tested
+class FirstService
+  include Infused
+end
+
+class SecondService
+  include Infused
+  
+  def initialize(a, b, *args)
+  end
+end
+
+class ThirdService
+  include Infused
+  
+  depends :FirstService, as: :first
+end
+
+class ServiceConsumer
+  include Infused
+  depends :FirstService, as: :first
+  depends :SecondService, as: :second, with: [1, 2, other=[3, 4]]
+  
+  def to_s
+    "#{@first.class} - #{@second.class}"
+  end          
+end
+
+class SecondServiceConsumer
+  include Infused
+  depends :SecondService, as: :second, with: [2, 3]
+  depends :ThirdService, as: :third
+end
+# End
+
 describe Infused do
 
-  describe ".configure" do
-
-    before(:all) do
-      class Admin; end
+  describe "when being included" do
+    
+    it "injects adds setters and getters automatically" do
+      c = ServiceConsumer.new
+      expect(c).to respond_to(:first)
+      expect(c).to respond_to(:first=)      
+      expect(c).to respond_to(:second)
+      expect(c).to respond_to(:second=)
     end
-
-    after(:all) do
-      Object.__send__(:remove_const, :Admin)
+    
+    it "instantiates instances with dependencies automatically" do
+      c = ServiceConsumer.new
+      expect(c.to_s).to eq('FirstService - SecondService')
     end
-
-    context "when provided a block" do
-
-      before do
-        described_class.configure do |registry|
-          registry.register_implementation(:admin, Admin)
-        end
-      end
-
-      let(:implementation) do
-        Injectable::Registry.implementation(:admin)
-      end
-
-      it "delegates to the registry" do
-        expect(implementation).to eq([ Admin ])
-      end
-    end
-
-    context "when not provided a block" do
-
-      let(:registry) do
-        described_class.configure
-      end
-
-      it "returns the registry" do
-        expect(registry).to eq(Injectable::Registry)
+    
+    context "when dependencies are recursive" do
+      it "recursively builds dependencies" do
+        c = SecondServiceConsumer.new
+        expect(c).to respond_to(:second)
+        expect(c.third).to respond_to(:first)
       end
     end
   end
-
-  describe ".included" do
-
-    before(:all) do
-      class User
-        include Injectable
-      end
-    end
-
-    after(:all) do
-      Object.__send__(:remove_const, :User)
-    end
-
-    let(:implementation) do
-      Injectable::Registry.implementation(:user)
-    end
-
-    it "adds the user to the implementations" do
-      expect(implementation).to eq([ User ])
-    end
+  
+  describe "container" do
+    
   end
+  
 end

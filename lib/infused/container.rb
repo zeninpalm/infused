@@ -24,5 +24,13 @@ module Infused
       @ctors_map.has_key?(id)
     end
     
+    def add(implementation)
+      sym = implementation.class.name.to_sym
+      @ctors_map[sym] = implementation
+    end
+    
+    def get(id)
+      @ctors_map[id]
+    end
   end
 end
