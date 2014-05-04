@@ -12,26 +12,24 @@ class SecondService
   end
 end
 
-class ThirdService
-  include Infused
-  
-  depends :FirstService, as: :first
-end
-
 class ServiceConsumer
   include Infused
-  depends :FirstService, as: :first
-  depends :SecondService, as: :second, with: [1, 2, other=[3, 4]]
+  depends first: :FirstService, another_first: :FirstService, second: :SecondService
   
   def to_s
-    "#{@first.class} - #{@second.class}"
+    "#{@first.class} - #{@another_first.class} - #{@second.class}"
   end          
 end
 
-class SecondServiceConsumer
+class ThirdService
   include Infused
-  depends :SecondService, as: :second, with: [2, 3]
-  depends :ThirdService, as: :third
+  
+  depends first: :FirstService
+end
+
+class AnotherServiceConsumer
+  include Infused
+  depends third: :ThirdService
 end
 # End
 
@@ -42,27 +40,26 @@ describe Infused do
     it "injects adds setters and getters automatically" do
       c = ServiceConsumer.new
       expect(c).to respond_to(:first)
-      expect(c).to respond_to(:first=)      
+      expect(c).to respond_to(:first=) 
+      expect(c).to respond_to(:another_first)
+      expect(c).to respond_to(:another_first=)     
       expect(c).to respond_to(:second)
       expect(c).to respond_to(:second=)
     end
     
     it "instantiates instances with dependencies automatically" do
-      c = ServiceConsumer.new
-      expect(c.to_s).to eq('FirstService - SecondService')
+      c = Infused::Container.new
+      sc = c.get(:ServiceConsumer)
+      expect(sc.to_s).to eq('FirstService - FirstService - SecondService')
     end
     
     context "when dependencies are recursive" do
       it "recursively builds dependencies" do
-        c = SecondServiceConsumer.new
-        expect(c).to respond_to(:second)
-        expect(c.third).to respond_to(:first)
+        c = Infused::Container.new
+        sc = c.get(:AnotherServiceConsumer)
+        expect(sc).to respond_to(:third)
+        expect(sc.third).to respond_to(:first)
       end
     end
   end
-  
-  describe "container" do
-    
-  end
-  
 end
