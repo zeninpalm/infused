@@ -1,18 +1,34 @@
 require 'infused/container'
 require 'infused/exception'
+require 'infused/dependencies_graph'
 
 module Infused
   def self.included(klass)
+    register_dependencies(klass)
     klass.extend(MacroMethods)
   end
   
+  def self.register_dependencies(klass)
+    DependenciesGraph.add(klass.name.to_sym, klass) 
+  end
+  
   module MacroMethods
-    def depends_on(attributes) 
+    def depends_on(attributes)
       define_readers(attributes)
-      define_setters(attributes)          
+      define_setters(attributes)
+      append_dependencies(attributes)          
     end
     
     private
+    
+    def append_dependencies(attributes)
+      klass = self.name.to_sym
+      
+      symbols = attributes.values
+      symbols.each do |s|
+        DependenciesGraph.append_dependency(klass, s)
+      end
+    end
     
     def define_readers(attributes)
       attributes.keys.each do |as|

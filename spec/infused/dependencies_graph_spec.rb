@@ -1,4 +1,4 @@
-decribe Infused::DependenciesGraph do
+describe Infused::DependenciesGraph do
   before do
     class First
       include Infused
@@ -12,6 +12,11 @@ decribe Infused::DependenciesGraph do
     class Final
       include Infused
       depends_on second: :Second
+    end
+    
+    class Other
+      include Infused
+      depends_on second: :Second, first: :First, third: :First
     end
   end
   
@@ -28,21 +33,21 @@ decribe Infused::DependenciesGraph do
   end
   
   it "returns corresponding class for :First" do
-    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+    expect(Infused::DependenciesGraph.get(:First)[:class]).to be_eql(First)
   end
   
-  it "returns corresponding class for :Second"
-    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+  it "returns corresponding class for :Second" do
+    expect(Infused::DependenciesGraph.get(:Second)[:class]).to be_eql(Second)
   end
   
-  it "returns corresponding class for :Final"
-    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+  it "returns corresponding class for :Final" do
+    expect(Infused::DependenciesGraph.get(:Final)[:class]).to be_eql(Final)
   end
   
   it "records dependecy relationships" do
-    expect(Infused::DependenciesGraph[:First][:dependencies]).to  be_eql([])
-    expect(Infused::DependenciesGraph[:Second].[:dependencies]).to be_eql([First])
-    expect(Infused::DependenciesGraph[:Final].[:dependencies]).to be_eql([Second])
-  end
-      
+    expect(Infused::DependenciesGraph.get(:First)[:dependencies]).to  be_eql([])
+    expect(Infused::DependenciesGraph.get(:Second)[:dependencies]).to be_eql([First])
+    expect(Infused::DependenciesGraph.get(:Final)[:dependencies]).to be_eql([Second])
+    expect(Infused::DependenciesGraph.get(:Other)[:dependencies]).to be_eql([Second, First, First])    
+  end     
 end
