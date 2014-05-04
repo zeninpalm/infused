@@ -15,10 +15,34 @@ decribe Infused::DependenciesGraph do
     end
   end
   
+  it "registers :First" do
+    expect(Infused::DependenciesGraph.has?(:First)).to be_true
+  end
+  
+  it "registers :Second" do
+    expect(Infused::DependenciesGraph.has?(:Second)).to be_true
+  end
+  
+  it "registers :Final" do
+    expect(Infused::DependenciesGraph.has?(:Final)).to be_true
+  end
+  
+  it "returns corresponding class for :First" do
+    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+  end
+  
+  it "returns corresponding class for :Second"
+    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+  end
+  
+  it "returns corresponding class for :Final"
+    expect(Infused::DependenciesGraph[:First][:class]).to be_eql(First)
+  end
+  
   it "records dependecy relationships" do
-    Infused::DependenciesGraph[:First] = []
-    Infused::DependenciesGraph[:Second] = [First]
-    Infused::DependenciesGraph[:Final] = [Second]
+    expect(Infused::DependenciesGraph[:First][:dependencies]).to  be_eql([])
+    expect(Infused::DependenciesGraph[:Second].[:dependencies]).to be_eql([First])
+    expect(Infused::DependenciesGraph[:Final].[:dependencies]).to be_eql([Second])
   end
       
 end
