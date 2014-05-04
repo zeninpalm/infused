@@ -1,11 +1,8 @@
 require 'infused/container'
-require 'infused/registry'
 require 'infused/exception'
-require 'infused/instantiator'
 
 module Infused
   def self.included(klass)
-    Registry.add(klass, klass.name.to_sym)
     klass.extend(MacroMethods)
   end
   

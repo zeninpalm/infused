@@ -5,54 +5,82 @@ end
 
 describe Infused::Container do
   
-  
-  context "when registering with constructors" do
+  context "when registering with 'register'" do
     before do
       @container = Infused::Container.new
     end
-        
-    context "when constructors are named" do  
-      it "registers constuctor with given id" do  
-        @container.register(ClassToBeRegistered, id = :class_to_be_registered)
-        expect(@container.has?(:class_to_be_registered)).to be_true
+    
+    it "registers direct factory methods" do
+      @container.register(:first) do |c|
+        3
       end
+      expect(@container.has?(:first)).to be_true
     end
-  
-    context "when constructors are not named" do
-      it "registers constructor with class name symbol" do
-        @container.register(ClassToBeRegistered)
-        expect(@container.has?(:ClassToBeRegistered)).to be_true
+    
+    it "returns the value of given block" do
+      @container.register(:second) do |c|
+        4
       end
+      expect(@container.get(:second)).to be_equal(4)
+    end
+    
+    it "calls blocks recursively" do
+      @container.register(:first) do |c|
+        3
+      end
+      @container.register(:second) do |c|
+        4
+      end
+      @container.register(:third) do |c|
+        c.get(:first) + c.get(:second)
+      end
+      expect(@container.get(:third)).to be_equal(7)
     end
   end
   
-  context "when registering with implementations" do
+  context "when registering with 'share'" do
     before do
       @container = Infused::Container.new
-      @ins = ClassToBeRegistered.new
-      @ins_1 = ClassToBeRegistered.new
     end
     
-    it "registers implementations under the symbol of class name" do
-      @container.add(@ins)
-      expect(@container.has?(:ClassToBeRegistered)).to be_true
+    it "registers blocks given in share block" do
+      @container.share(:first) do |c|
+        3
+      end
+      expect(@container.has?(:first)).to be_true
     end
     
-    it "returns the same instance" do
-      @container.add(@ins)
-      i = @container.get(:ClassToBeRegistered)
-      expect(i).to be_equal(@ins)
+    it "returns the value of given block" do
+      @container.share(:second) do |c|
+        4
+      end
+      expect(@container.get(:second)).to be_equal(4)
     end
     
-    it "registers implementation under given symbol" do
-      @container.add(@ins_1, :ins_1)
-      expect(@container.has?(:ins_1)).to be_true
+    it "calls blocks recursively" do
+      @container.share(:first) do |c|
+        3
+      end
+      @container.share(:second) do |c|
+        4
+      end
+      @container.share(:third) do |c|
+        c.get(:first) + c.get(:second)
+      end
+      expect(@container.get(:third)).to be_equal(7)
     end
     
-    it "returns the same instance with given id" do
-      @container.add(@ins_1, :ins_1)
-      i = @container.get(:ins_1)
-      expect(i).to be_equal(@ins_1)
+    it "calls blocks lazilly" do
+      class Dummy; end
+      
+      @container.share(:Dummy) do |c|
+        Dummy.new
+      end
+      
+      obj_1 = @container.get(:Dummy)
+      obj_2 = @container.get(:Dummy)
+      
+      expect(obj_1).to be_equal(obj_2)
     end
   end
 end

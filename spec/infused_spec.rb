@@ -7,9 +7,6 @@ end
 
 class SecondService
   include Infused
-  
-  def initialize(a, b, *args)
-  end
 end
 
 class ServiceConsumer
@@ -49,6 +46,23 @@ describe Infused do
     
     it "instantiates instances with dependencies automatically" do
       c = Infused::Container.new
+      c.register(:FirstService) do |c|
+        FirstService.new
+      end
+      c.register(:SecondService) do |c|
+        SecondService.new
+      end
+      c.register(:ServiceConsumer) do |c|
+        f = c.get(:FirstService)
+        f1 = c.get(:FirstService)
+        s = c.get(:SecondService)
+        sc = ServiceConsumer.new
+        sc.first = f
+        sc.another_first = f1
+        sc.second = s
+        sc
+      end
+      
       sc = c.get(:ServiceConsumer)
       expect(sc.to_s).to eq('FirstService - FirstService - SecondService')
     end
@@ -56,6 +70,22 @@ describe Infused do
     context "when dependencies are recursive" do
       it "recursively builds dependencies" do
         c = Infused::Container.new
+        c.register(:First) do |c|
+          FirstService.new
+        end
+        c.register(:ThirdService) do |c|
+          f = c.get(:First)
+          t = ThirdService.new
+          t.first = f
+          t
+        end
+        c.register(:AnotherServiceConsumer) do |c|
+          t = c.get(:ThirdService)
+          asc = AnotherServiceConsumer.new
+          asc.third = t
+          asc
+        end
+        
         sc = c.get(:AnotherServiceConsumer)
         expect(sc).to respond_to(:third)
         expect(sc.third).to respond_to(:first)
