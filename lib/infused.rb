@@ -7,7 +7,7 @@ module Infused
   end
   
   module MacroMethods
-    def depends(attributes) 
+    def depends_on(attributes) 
       define_readers(attributes)
       define_setters(attributes)          
     end

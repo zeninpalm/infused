@@ -11,7 +11,7 @@ end
 
 class ServiceConsumer
   include Infused
-  depends first: :FirstService, another_first: :FirstService, second: :SecondService
+  depends_on first: :FirstService, another_first: :FirstService, second: :SecondService
   
   def to_s
     "#{@first.class} - #{@another_first.class} - #{@second.class}"
@@ -21,12 +21,12 @@ end
 class ThirdService
   include Infused
   
-  depends first: :FirstService
+  depends_on first: :FirstService
 end
 
 class AnotherServiceConsumer
   include Infused
-  depends third: :ThirdService
+  depends_on third: :ThirdService
 end
 # End
 
