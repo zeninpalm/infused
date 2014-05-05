@@ -33,3 +33,6 @@ The constructor is not affected in anyway. And client may get instances of Servi
 container = Infused::Container.new
 sc = container.get(:ServiceConsumer)
 ```
+
+More to come
+____________
