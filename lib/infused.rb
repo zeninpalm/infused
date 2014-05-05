@@ -1,6 +1,7 @@
 require 'infused/container'
 require 'infused/exception'
 require 'infused/dependencies_graph'
+require 'infused/instantiator'
 
 module Infused
   def self.included(klass)
