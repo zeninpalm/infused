@@ -83,4 +83,25 @@ describe Infused::Container do
       expect(obj_1).to be_equal(obj_2)
     end
   end
+  
+  context "when not registered with container, but registered with DependenciesGraph" do
+    before do
+      class A
+        include Infused
+      end
+      
+      class B
+        include Infused
+        depends_on a: :A
+      end
+    end
+    
+    it "returns intance of B automatically" do
+      @container = Infused::Container.new
+      b = @container.get(:B)
+      expect(b.class.name.to_sym).to be_equal(:B)
+      expect(b).to respond_to(:a)
+      expect(b).to respond_to(:a=)
+    end
+  end
 end

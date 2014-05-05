@@ -15,7 +15,11 @@ module Infused
 
     def get(id)
       if not @ctors_map.has_key? id
-        raise ConstructorNotRegisteredError.new "id:#{id} is not registered"
+        if not DependenciesGraph.has? id
+          raise ConstructorNotRegisteredError.new "id:#{id} is not registered in Container and DependenciesGraph"
+        else
+          return Instantiator.make(DependenciesGraph, id)
+        end
       end
       
       if @ctors_map[id][:shared] == false
