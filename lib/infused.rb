@@ -24,9 +24,8 @@ module Infused
     def append_dependencies(attributes)
       klass = self.name.to_sym
       
-      symbols = attributes.values
-      symbols.each do |s|
-        DependenciesGraph.append_dependency(klass, s)
+      attributes.keys.each do |k|
+        DependenciesGraph.append_dependency(klass, k, attributes[k])
       end
     end
     

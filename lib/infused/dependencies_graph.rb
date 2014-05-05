@@ -13,8 +13,8 @@ module Infused
       @dependency_map[id]
     end
     
-    def self.append_dependency(id, class_symbol)
-      @dependency_map[id][:dependencies] << (eval class_symbol.to_s)
+    def self.append_dependency(id, k, v)
+      @dependency_map[id][:dependencies] << { k => (eval v.to_s) }
     end
   end
 end

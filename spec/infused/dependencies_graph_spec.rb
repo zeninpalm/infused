@@ -46,8 +46,8 @@ describe Infused::DependenciesGraph do
   
   it "records dependecy relationships" do
     expect(Infused::DependenciesGraph.get(:First)[:dependencies]).to  be_eql([])
-    expect(Infused::DependenciesGraph.get(:Second)[:dependencies]).to be_eql([First])
-    expect(Infused::DependenciesGraph.get(:Final)[:dependencies]).to be_eql([Second])
-    expect(Infused::DependenciesGraph.get(:Other)[:dependencies]).to be_eql([Second, First, First])    
+    expect(Infused::DependenciesGraph.get(:Second)[:dependencies]).to be_eql([{first: First}])
+    expect(Infused::DependenciesGraph.get(:Final)[:dependencies]).to be_eql([{second: Second}])
+    expect(Infused::DependenciesGraph.get(:Other)[:dependencies]).to be_eql([{second: Second}, {first: First}, {third: First}])    
   end     
 end
