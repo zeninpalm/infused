@@ -1,4 +1,4 @@
-Infused
+Infused 1.0
 =============
 
 Infused is a lightweight yet flexible dependency container and dependency injection framework for Ruby.
