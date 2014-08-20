@@ -15,8 +15,7 @@ module Infused
   
   module MacroMethods
     def depends_on(attributes)
-      define_readers(attributes)
-      define_setters(attributes)
+      define_accessors(attributes)
       append_dependencies(attributes)          
     end
     
@@ -29,20 +28,10 @@ module Infused
         DependenciesGraph.append_dependency(klass, k, attributes[k])
       end
     end
-    
-    def define_readers(attributes)
+
+    def define_accessors(attributes)
       attributes.keys.each do |as|
-        define_method "#{as.to_s}" do
-          instance_variable_get "@#{as.to_s}"
-        end
-      end
-    end
-    
-    def define_setters(attributes)
-      attributes.keys.each do |as|
-        define_method "#{as.to_s}=" do |value|
-          instance_variable_set("@#{as.to_s}", value)
-        end
+        self.send(:attr_accessor, as.to_sym)
       end
     end
     
